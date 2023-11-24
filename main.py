@@ -1,4 +1,5 @@
 import os
+from socketserver import BaseRequestHandler
 import sqlite3
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import HTMLResponse, JSONResponse
@@ -7,7 +8,7 @@ from data import SQLRepository
 from model import GarchModel
 from pydantic import BaseModel
 from fastapi.staticfiles import StaticFiles
-
+from fastapi import logger
 class FitIn(BaseModel):
     ticker: str
     use_new_data: bool
@@ -15,18 +16,22 @@ class FitIn(BaseModel):
     p: int
     q: int
 
+
 class FitOut(FitIn):
     success: bool
     message: str
+
 
 class PredictIn(BaseModel):
     ticker: str
     n_minutes: int
 
+
 class PredictOut(PredictIn):
     success: bool
     forecast: dict
     message: str
+
 
 def build_model(ticker: str, use_new_data: bool) -> GarchModel:
     connection = sqlite3.connect(settings.db_name)
@@ -34,10 +39,23 @@ def build_model(ticker: str, use_new_data: bool) -> GarchModel:
     model = GarchModel(ticker=ticker, use_new_data=use_new_data, repo=repo)
     return model
 
+
 app = FastAPI()
 
 app.mount("/static", StaticFiles(directory="docs/static"), name="static")
 html_file_path = os.path.join(os.path.dirname(__file__), "docs", "index.html")
+
+
+@app.exception_handler(Exception)
+async def handle_exception(request: BaseRequestHandler, exc: Exception):
+    # Log the exception
+    logger.error(exc)
+
+    # Return a JSON response with the error message
+    return JSONResponse(
+        content={"message": str(exc)}, status_code=500, headers={"Content-Type": "application/json"}
+    )
+
 
 @app.get("/", response_class=HTMLResponse)
 async def get_volatility_forecasts():
@@ -53,6 +71,7 @@ async def get_volatility_forecasts():
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
 
+
 @app.post("/fit", status_code=200, response_model=FitOut)
 def fit_model(request: FitIn) -> FitOut:
     response = request.dict()
@@ -60,13 +79,19 @@ def fit_model(request: FitIn) -> FitOut:
         model = build_model(ticker=request.ticker, use_new_data=request.use_new_data)
         model.wrangle_data(n_observations=request.n_observations)
         model.fit(p=request.p, q=request.q)
-        filename = model.dump()
-        response["success"] = True
-        response["message"] = f"Trained and saved {filename}. Metrics: AIC {model.aic}, BIC {model.bic}."
+
+        # Check if model.aic and model.bic exist before accessing them
+        if hasattr(model, 'aic') and hasattr(model, 'bic'):
+            filename = model.dump()
+            response["success"] = True
+            response["message"] = f"Trained and saved {filename}. Metrics: AIC {model.aic}, BIC {model.bic}."
+        else:
+            raise Exception("Model attributes 'aic' or 'bic' are not available")
     except Exception as e:
         response["success"] = False
         response["message"] = str(e)
     return response
+
 
 @app.post("/predict", status_code=200, response_model=PredictOut)
 def get_prediction(request: PredictIn) -> PredictOut:
@@ -84,6 +109,8 @@ def get_prediction(request: PredictIn) -> PredictOut:
         response["message"] = str(e)
     return response
 
+
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="127.0.0.1", port=8000)
