@@ -1,6 +1,7 @@
 import os
 import sqlite3
 from fastapi import FastAPI, HTTPException, Response
+from fastapi.responses import HTMLResponse
 from starlette.responses import JSONResponse
 from config import settings
 from data import SQLRepository
@@ -46,26 +47,19 @@ app.mount("/static", StaticFiles(directory="docs/static"), name="static")
 html_file_path = os.path.join(os.path.dirname(__file__), "docs", "index.html")
 
 
-@app.get("/", response_class=JSONResponse)
+@app.get("/", response_class=HTMLResponse)  # Change the response class to HTMLResponse
 async def get_volatility_forecasts():
     try:
         with open(html_file_path, "r") as html_file:
             html_content = html_file.read()
 
-        return JSONResponse(
-            content={"message": "HTML content retrieved successfully"},
-            status_code=200,
-            headers={"Content-Type": "application/json"},
+        return HTMLResponse(
+            content=html_content, status_code=200, headers={"Content-Type": "text/html"}
         )
-
     except FileNotFoundError:
-        raise HTTPException(
-            status_code=404, detail="Error: HTML file not found"
-        )
+        raise HTTPException(status_code=404, detail="Error: HTML file not found")
     except Exception as e:
-        raise HTTPException(
-            status_code=500, detail=f"Error: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
 
 
 @app.post("/fit", status_code=200, response_model=FitOut)
