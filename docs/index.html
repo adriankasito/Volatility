@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Volatility Forecast</title>
+  <link rel="stylesheet" href="./static/styles.css">
+</head>
+<body>
+  <div class="container">
+    <h1 id="interactiveTitle">Volatility Forecasting In Microsoft Corporation</h1>
+    <p>
+      For a more detailed explanation, you can refer to 
+      <a href="https://docs.google.com/document/d/1EJzzytfVsCIKLR6MQH6gGue_UVqOB3-YWm9x_BK9Z1w/edit?usp=sharing" target="_blank">this document</a>.
+    </p>
+    <label for="minutesSlider">Time range in minutes:</label>
+    <input type="range" min="1" max="10000" value="25" class="slider" id="minutesSlider">
+    <p id="selectedMinutes">Selected minutes: 25</p>
+    <button id="forecastButton">Get Volatility Forecast</button>
+    <button id="resetButton">Reset Table</button>
+    <table>
+      <tr>
+        <th>Microsoft Corporation Volatility By Minute</th>
+        <th>Date</th>
+        <th>Time</th>
+        <th>Volatility</th>
+      </tr>
+    </table>
+    <img id="appImage" src="./static/image.png" alt="App Image">
+  </div>
+  <script src="./static/scripts.js"></script>
+</body>
+</html>

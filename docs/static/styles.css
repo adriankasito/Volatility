@@ -1,0 +1,64 @@
+body {
+    font-family: "Times New Roman", serif;
+    background-color: #f0f0f0;
+    text-align: center;
+    position: relative;
+  }
+  h1 {
+    font-family: "Apple Chancery", cursive;
+    transition:
+      color 0.5s ease-in-out,
+      transform 0.5s ease-in-out;
+    position: relative;
+    z-index: 1;
+  }
+  .container {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    margin: 20px;
+  }
+  button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 10px;
+  }
+  button:hover {
+    background-color: #0056b3;
+  }
+  #minutesSlider {
+    width: 80%;
+    margin: 10px auto;
+  }
+  table {
+    width: 80%;
+    margin: 20px auto;
+    border-collapse: collapse;
+    text-align: center;
+  }
+  th,
+  td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    font-style: italic;
+  }
+  .odd {
+    background-color: #f5f5f5;
+  }
+  .even {
+    background-color: #e0e0e0;
+  }
+  #appImage {
+    max-width: 100px;
+    height: auto;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 0;
+  }
+  

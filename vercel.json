@@ -1,0 +1,10 @@
+{
+    "version": 2,
+    "builds": [
+      { "src": "main.py", "use": "@vercel/python", "config": { "runtime": "python3.9" }}
+    ],
+    "routes": [
+      { "src": "/static/(.*)", "dest": "/docs/static/$1" },
+      { "src": "/(.*)", "dest": "/main.py" }
+    ]
+  }
