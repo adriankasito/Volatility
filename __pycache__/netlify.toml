@@ -1,0 +1,4 @@
+[build]
+  base = "/"
+  publish = "."
+  command = "python main.py"  # Replace with the appropriate command to run your FastAPI app
